@@ -14,13 +14,28 @@ apt_repository "nginx" do
   distribution node["lsb"]["codename"]
 end
 
-[node["nginx"]["dir"], node["nginx"]["log_dir"]].each do |dir|
-  directory dir do
-    owner "root"
-    group "root"
-    mode "0755"
-    recursive true
-  end
+package "nginx" do
+  options %(-o Dpkg::Options::="--force-confdef")
+end
+
+service "nginx" do
+  supports status: true, restart: true, reload: true, stop: true
+  provider Chef::Provider::Service::Init::Debian
+  action [:enable, :start]
+end
+
+directory node["nginx"]["dir"] do
+  owner "root"
+  group "root"
+  mode "0755"
+  recursive true
+end
+
+directory node["nginx"]["log_dir"] do
+  owner "www-data"
+  group "adm"
+  mode "0755"
+  recursive true
 end
 
 %w[sites-available sites-enabled].each do |vhost_dir|
@@ -30,10 +45,6 @@ end
     mode   "0755"
     action :create
   end
-end
-
-package "nginx" do
-  options %(-o Dpkg::Options::="--force-confdef")
 end
 
 cookbook_file "#{node["nginx"]["dir"]}/mime.types" do
@@ -63,14 +74,6 @@ end
 end
 
 nginx_site "default" do
-  action :delete
-  host node["hostname"]
-  root "/usr/share/nginx/html"
-  only_if { node["nginx"]["skip_default_site"] }
-  notifies :reload, "service[nginx]"
-end
-
-nginx_site "default" do
   action [:create, :enable]
   host node["hostname"]
   root "/usr/share/nginx/html"
@@ -82,9 +85,4 @@ end
 file "#{node["nginx"]["dir"]}/conf.d/default" do
   action :delete
   notifies :restart, "service[nginx]"
-end
-
-service "nginx" do
-  supports status: true, restart: true, reload: true
-  action [:enable, :start]
 end

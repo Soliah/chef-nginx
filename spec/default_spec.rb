@@ -18,7 +18,7 @@ describe "nginx::default" do
     expect(chef_run).to create_directory("/etc/nginx").with(owner: "root", group: "root", mode: "0755")
     expect(chef_run).to create_directory("/etc/nginx/sites-enabled").with(owner: "root", group: "root", mode: "0755")
     expect(chef_run).to create_directory("/etc/nginx/sites-available").with(owner: "root", group: "root", mode: "0755")
-    expect(chef_run).to create_directory("/var/log/nginx").with(owner: "root", group: "root", recursive: true)
+    expect(chef_run).to create_directory("/var/log/nginx").with(owner: "www-data", group: "adm", recursive: true)
   end
 
   it "creates main nginx.conf" do
@@ -46,18 +46,6 @@ describe "nginx::default" do
   end
 
   context "default site" do
-    context "when `skip_default_site` is false" do
-      let(:chef_run) do
-        ChefSpec::SoloRunner.new do |node|
-          node.set["nginx"]["skip_default_site"] = false
-        end.converge(described_recipe)
-      end
-
-      it "enables the default site" do
-        expect(chef_run).to create_nginx_site("default")
-      end
-    end
-
     context "when `skip_default_site` is true" do
       let(:chef_run) do
         ChefSpec::SoloRunner.new do |node|
@@ -66,7 +54,7 @@ describe "nginx::default" do
       end
 
       it "disables the default site" do
-        expect(chef_run).to delete_nginx_site("default")
+        expect(chef_run).to_not create_nginx_site("default")
       end
 
       it "does not create the `default` template" do
