@@ -11,8 +11,8 @@ use_inline_resources
 
 action :create do
   template nginx_available_file do
-    source new_resource.template_source
-    cookbook new_resource.template_cookbook
+    source new_resource.source
+    cookbook new_resource.cookbook
     owner "root"
     group "root"
     mode "0644"
@@ -22,10 +22,7 @@ action :create do
       host: new_resource.host,
       root: new_resource.root,
       index: new_resource.index,
-      location: new_resource.location,
-      phpfpm: new_resource.phpfpm,
-      access_log: new_resource.access_log,
-      custom_data: new_resource.custom_data
+      location: new_resource.location
     )
   end
 end
@@ -46,8 +43,10 @@ end
 
 action :enable do
   if @current_resource.exists
-    execute "nxensite #{new_resource.name}" do
-      command "#{node["nginx"]["bin_dir"]}/nxensite #{new_resource.name}"
+    link new_resource.name do
+      target_file nginx_enabled_file
+      to nginx_available_file
+      action :create
       not_if { ::File.exist?(nginx_enabled_file) }
     end
   else
@@ -57,8 +56,10 @@ end
 
 action :disable do
   if @current_resource.exists
-    execute "nxdissite #{new_resource.name}" do
-      command "#{node["nginx"]["bin_dir"]}/nxdissite #{new_resource.name}"
+    file new_resource.name do
+      manage_symlink_source true
+      path nginx_enabled_file
+      action :delete
       only_if { ::File.exist?(nginx_enabled_file) }
     end
   else
@@ -69,7 +70,6 @@ end
 def load_current_resource
   @current_resource = Chef::Resource::NginxSite.new(@new_resource.name)
   @current_resource.name(@new_resource.name)
-
   @current_resource.exists = ::File.exist?(nginx_available_file)
 end
 

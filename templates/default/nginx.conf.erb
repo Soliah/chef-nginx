@@ -1,30 +1,57 @@
+# vi:syntax=nginx
+# Managed by Chef. Local modifications will be overwritten!
+
 user <%= node["nginx"]["user"] %>;
 worker_processes <%= node["nginx"]["worker_processes"] %>;
-
-<% if node["nginx"]["daemon_disable"] -%>
-daemon off;
-<% end -%>
-
-error_log <%= node["nginx"]["log_dir"] %>/error.log;
-pid       <%= node["nginx"]["pid_file"] %>;
+pid <%= node["nginx"]["pid_file"] %>;
 
 events {
-  worker_connections <%= node["nginx"]["worker_connections"] %>;
-  accept_mutex <%= node["nginx"]["worker_processes"].to_i > 1 ? "on" : "off" %>;
-  <% if node["nginx"]["use_poll"] %>
-  use epoll;
-  <% end %>
+    worker_connections <%= node["nginx"]["worker_connections"] %>;
+    accept_mutex <%= node["nginx"]["worker_processes"].to_i > 1 ? "on" : "off" %>;
+    <% if node["nginx"]["use_epoll"] %>
+    use epoll;
+    <% end %>
 }
 
 http {
-  server_names_hash_bucket_size <%= node["nginx"]["server_names_hash_bucket_size"] %>;
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+    keepalive_timeout 65;
+    types_hash_max_size 2048;
 
-  include      <%= node["nginx"]["dir"] %>/mime.types;
-  default_type application/octet-stream;
+    access_log <%= node["nginx"]["log_dir"] %>/access.log;
+    error_log <%= node["nginx"]["log_dir"] %>/error.log;
 
-  # additional config
-  include <%= node["nginx"]["dir"] %>/conf.d/*.conf;
+    server_names_hash_bucket_size <%= node["nginx"]["server_names_hash_bucket_size"] %>;
 
-  # virtual hosting
-  include <%= node["nginx"]["dir"] %>/sites-enabled/*;
+    include <%= node["nginx"]["dir"] %>/mime.types;
+    default_type application/octet-stream;
+
+    ## Compression
+    gzip              <%= node["nginx"]["gzip"] %>;
+    <% if node["nginx"]["gzip"] == "on" %>
+    gzip_buffers      <%= node["nginx"]["gzip_buffers"] %>;
+    gzip_comp_level   <%= node["nginx"]["gzip_comp_level"] %>;
+    gzip_http_version <%= node["nginx"]["gzip_http_version"] %>;
+    gzip_min_length   <%= node["nginx"]["gzip_min_length"] %>;
+    gzip_types        <%= node["nginx"]["gzip_types"].join(" ") %>;
+    gzip_vary         <%= node["nginx"]["gzip_vary"] %>;
+    gzip_proxied      <%= node["nginx"]["gzip_proxied"] %>;
+    gzip_disable      "msie6";
+    <% end %>
+
+    # Proxying
+    proxy_redirect <%= node["nginx"]["proxy_redirect"] %>;
+    proxy_read_timeout <%= node["nginx"]["proxy_read_timeout"] %>;
+    proxy_max_temp_file_size <%= node["nginx"]["proxy_max_temp_file_size"] %>;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    # additional config
+    include <%= node["nginx"]["dir"] %>/conf.d/*.conf;
+
+    # virtual hosting
+    include <%= node["nginx"]["dir"] %>/sites-enabled/*;
 }

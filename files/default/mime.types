@@ -1,3 +1,6 @@
+# vi:syntax=nginx
+# Managed by Chef. Local modifications will be overwritten!
+
 types {
   text/html                             html htm shtml;
   text/css                              css;

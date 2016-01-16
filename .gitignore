@@ -11,3 +11,4 @@ tmp/
 .vagrant.d/
 Thorfile
 Vagrantfile
+cookbooks
