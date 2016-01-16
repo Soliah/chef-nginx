@@ -11,4 +11,4 @@ test:
   override:
     # Docker build environment doesn't have permission to destroy containers
     - chef exec bundle exec kitchen verify
-    - chef exec bundle exec rspec spec
+    - chef exec bundle exec rspec spec -r rspec_junit_formatter --format RspecJunitFormatter -o $CIRCLE_TEST_REPORTS/rspec/junit.xml
