@@ -9,7 +9,6 @@ Installs the [nginx](http://nginx.org) web server. This has been heavily modifie
 Only tested to be working on the following Ubuntu versions below, but may work on earlier versions too.
 
 - Ubuntu 14.04
-- Ubuntu 12.04
 
 ## Attributes
 
