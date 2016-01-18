@@ -2,7 +2,7 @@
 
 # chef-nginx
 
-Installs the [nginx](http://nginx.org) web server. This has been heavily modified from [upstream](phlipper/chef-nginx) for my needs.
+Installs the [nginx](http://nginx.org) web server. This has been heavily modified from [upstream](https://github.com/phlipper/chef-nginx) for my needs.
 
 ## Requirements
 
