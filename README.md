@@ -1,4 +1,4 @@
-[![Circle CI](https://circleci.com/gh/Soliah/chef-nginx.svg?style=svg)](https://circleci.com/gh/Soliah/chef-nginx)
+[![Circle CI](https://circleci.com/gh/kinesisptyltd/chef-nginx.svg?style=svg)](https://circleci.com/gh/kinesisptyltd/chef-nginx)
 
 # chef-nginx
 
