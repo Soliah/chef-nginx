@@ -18,12 +18,6 @@ package "nginx" do
   options %(-o Dpkg::Options::="--force-confdef")
 end
 
-service "nginx" do
-  supports status: true, restart: true, reload: true, stop: true
-  provider Chef::Provider::Service::Init::Debian
-  action [:enable, :start]
-end
-
 directory node["nginx"]["dir"] do
   owner "root"
   group "root"
@@ -47,12 +41,23 @@ end
   end
 end
 
+service "nginx" do
+  supports status: true, restart: true, reload: true, stop: true
+  provider Chef::Provider::Service::Init::Debian
+  action [:enable]
+end
+
+# Remove other default sites
+file "#{node["nginx"]["dir"]}/conf.d/default" do
+  action :delete
+  notifies :restart, "service[nginx]"
+end
+
 cookbook_file "#{node["nginx"]["dir"]}/mime.types" do
   source "mime.types"
   owner "root"
   group "root"
   mode  "0644"
-  notifies :restart, "service[nginx]"
 end
 
 template "nginx.conf" do
@@ -61,7 +66,7 @@ template "nginx.conf" do
   owner "root"
   group "root"
   mode  "0644"
-  notifies :restart, "service[nginx]"
+  notifies :start, "service[nginx]"
 end
 
 # Ensure default site is disabled if necessary
@@ -79,10 +84,4 @@ nginx_site "default" do
   root "/usr/share/nginx/html"
   not_if { node["nginx"]["skip_default_site"] }
   notifies :reload, "service[nginx]"
-end
-
-# Remove other default sites
-file "#{node["nginx"]["dir"]}/conf.d/default" do
-  action :delete
-  notifies :restart, "service[nginx]"
 end
