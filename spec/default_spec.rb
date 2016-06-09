@@ -12,7 +12,6 @@ describe "nginx::default" do
   it { expect(chef_run).to add_apt_repository("nginx") }
   it { expect(chef_run).to install_package("nginx") }
   it { expect(chef_run).to enable_service("nginx") }
-  it { expect(chef_run).to start_service("nginx") }
 
   it "creates directories" do
     expect(chef_run).to create_directory("/etc/nginx").with(owner: "root", group: "root", mode: "0755")
@@ -30,7 +29,7 @@ describe "nginx::default" do
     )
 
     file = chef_run.template("/etc/nginx/nginx.conf")
-    expect(file).to notify("service[nginx]").to(:restart)
+    expect(file).to notify("service[nginx]").to(:start)
   end
 
   it "creates mime types file" do
@@ -40,9 +39,6 @@ describe "nginx::default" do
       group: "root",
       mode:  "0644"
     )
-
-    file = chef_run.cookbook_file("/etc/nginx/mime.types")
-    expect(file).to notify("service[nginx]").to(:restart)
   end
 
   context "default site" do
