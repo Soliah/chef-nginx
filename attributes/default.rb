@@ -7,7 +7,7 @@
 # Copyright 2013, Phil Cohen
 #
 
-default["nginx"]["version"]    = nil
+default["nginx"]["version"]    = "1.10\*"
 default["nginx"]["dir"]        = "/etc/nginx"
 default["nginx"]["log_dir"]    = "/var/log/nginx"
 default["nginx"]["user"]       = "www-data"

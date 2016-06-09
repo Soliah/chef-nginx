@@ -16,6 +16,7 @@ end
 
 package "nginx" do
   options %(-o Dpkg::Options::="--force-confdef")
+  version node["nginx"]["version"]
 end
 
 directory node["nginx"]["dir"] do
