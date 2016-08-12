@@ -74,6 +74,7 @@ end
 %w[enabled].each do |dir|
   file "#{node["nginx"]["dir"]}/sites-#{dir}/default" do
     action :delete
+    manage_symlink_source true
     only_if { node["nginx"]["skip_default_site"] }
     notifies :reload, "service[nginx]"
   end
