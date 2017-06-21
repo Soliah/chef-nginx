@@ -10,6 +10,12 @@ server {
     index <%= @index %>;
   }
 
+  <% @remove_paths.each do |path_to_remove| %>
+  location ~ ^/<%= path_to_remove %>/* {
+    rewrite /<%= path_to_remove %>(.*)$ $1 last;
+  }
+  <% end %>
+
   # Deny access to .htaccess & .htpasswd files
   location ~ /\.ht {
     deny all;

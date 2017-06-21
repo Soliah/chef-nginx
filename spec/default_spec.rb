@@ -43,12 +43,6 @@ describe "nginx::default" do
 
   context "default site" do
     context "when `skip_default_site` is true" do
-      let(:chef_run) do
-        ChefSpec::SoloRunner.new do |node|
-          node.set["nginx"]["skip_default_site"] = true
-        end.converge(described_recipe)
-      end
-
       it "disables the default site" do
         expect(chef_run).to_not create_nginx_site("default")
       end
@@ -60,6 +54,30 @@ describe "nginx::default" do
       it "removes the default site configuration" do
         expect(chef_run).to delete_file("/etc/nginx/sites-enabled/default")
       end
+    end
+
+    context "with no remove_paths" do
+      let(:chef_run) do
+        ChefSpec::SoloRunner.new do |node|
+          node.set["nginx"]["skip_default_site"] = false
+        end.converge(described_recipe)
+      end
+
+      it "creates the default site" do
+        expect(chef_run).to create_nginx_site("default")
+      end
+    end
+  end
+
+  context "nginx_site" do
+    let(:chef_run) do
+      ChefSpec::SoloRunner.new(step_into: ["nginx_site"]) do |node|
+        node.set["nginx"]["skip_default_site"] = false
+      end.converge(described_recipe)
+    end
+
+    it "creates creates the default template" do
+      expect(chef_run).to create_template("/etc/nginx/sites-available/default")
     end
   end
 

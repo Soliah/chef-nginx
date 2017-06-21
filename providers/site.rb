@@ -22,7 +22,8 @@ action :create do
       host: new_resource.host,
       root: new_resource.root,
       index: new_resource.index,
-      location: new_resource.location
+      location: new_resource.location,
+      remove_paths: new_resource.remove_paths
     )
   end
 end

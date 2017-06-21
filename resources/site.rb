@@ -15,5 +15,6 @@ attribute :index, kind_of: String, default: "index.html index.htm"
 attribute :location, kind_of: String
 attribute :cookbook, kind_of: String, default: "nginx"
 attribute :source, kind_of: String, default: "site.erb"
+attribute :remove_paths, kind_of: Array, default: []
 
 attr_accessor :exists
