@@ -1,0 +1,52 @@
+environments:
+  development:
+    pipelines:
+      - chef-nginx
+pipelines:
+  chef-nginx:
+    group: development
+    materials:
+      gitMaterial1:
+        git: git@github.com:kinesisptyltd/chef-nginx.git
+    stages:
+      - test:
+          jobs:
+            test:
+              artifacts:
+                - test:
+                    source: junit.xml
+                    destination: junit
+              tasks:
+                - exec:
+                    command: bash
+                    arguments:
+                    - -c
+                    - 'curl https://omnitruck.chef.io/install.sh | sudo bash -s -- -v 1.3.43 -P chefdk'
+                - exec:
+                    command: chef
+                    arguments:
+                    - exec
+                    - bundle
+                    - install
+                - exec:
+                    command: chef
+                    arguments:
+                    - exec
+                    - bundle
+                    - exec
+                    - kitchen
+                    - verify
+                - exec:
+                    command: chef
+                    arguments:
+                    - exec
+                    - bundle
+                    - exec
+                    - rspec
+                    - spec
+                    - -r
+                    - rspec_junit_formatter
+                    - --format
+                    - RspecJunitFormatter
+                    - -o
+                    - junit.xml
