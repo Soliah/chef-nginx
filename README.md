@@ -1,5 +1,3 @@
-[![Circle CI](https://circleci.com/gh/kinesisptyltd/chef-nginx.svg?style=svg)](https://circleci.com/gh/kinesisptyltd/chef-nginx)
-
 # chef-nginx
 
 Installs the [nginx](http://nginx.org) web server. This has been heavily modified from [upstream](https://github.com/phlipper/chef-nginx) for my needs.
