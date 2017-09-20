@@ -1,5 +1,5 @@
 environments:
-  chef:
+  development:
     pipelines:
       - chef-nginx
 pipelines:
